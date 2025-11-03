@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>O mnie — strona jednoplikowa</title>
+
+  <!-- Meta / SEO -->
+  <meta name="description" content="Prosta, responsywna i dostępna strona typu 'O mnie' — jednoplikowa wizytówka." />
+  <meta property="og:title" content="O mnie — wizytówka" />
+  <meta property="og:description" content="Prosta, responsywna i dostępna strona typu 'O mnie' — jednoplikowa wizytówka." />
+  <meta property="og:type" content="website" />
+
+  <!-- Colors & theming -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115">
+
+  <style>
+    /* ======= Reset i podstawy ======= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html:focus-within { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      color: var(--fg);
+      background: var(--bg);
+    }
+    :root {
+      --bg: #f7f7f7;
+      --panel: #ffffff;
+      --fg: #1a1d22;
+      --muted: #4b5563;
+      --brand: #2e7dff;
+      --brand-contrast: #0a1f44;
+      --border: #e5e7eb;
+      --focus: #ff8a00;
+      --success: #137333;
+      --danger: #b00020;
+      --shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1115;
+        --panel: #151923;
+        --fg: #e6e7ea;
+        --muted: #9aa3af;
+        --brand: #66a3ff;
+        --brand-contrast: #cfe0ff;
+        --border: #232838;
+        --focus: #ffd166;
+        --success: #57dba2;
+        --danger: #ff7b89;
+        --shadow: 0 6px 20px rgba(0,0,0,.35);
+      }
+    }
+
+    /* Widoczny focus dla klawiatury */
+    :focus {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    /* Link 'Pomiń do treści' (skip link) */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--focus);
+      color: #000;
+      padding: .5rem .75rem;
+      z-index: 1000;
+      border-radius: .375rem;
+    }
+    .skip-link:focus { top: .5rem; left: .5rem; }
+
+    /* ======= Układ ogólny ======= */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-weight: 700;
+    }
+    .brand-logo {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, var(--brand), var(--brand-contrast));
+      border: 2px solid var(--border);
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1rem;
+      padding: 0; margin: 0;
+      align-items: center;
+    }
+    nav a {
+      color: var(--fg);
+      text-decoration: none;
+      padding: .5rem .75rem;
+      border-radius: .5rem;
+    }
+    nav a[aria-current="page"],
+    nav a:hover {
+      background: color-mix(in oklab, var(--brand) 15%, transparent);
+    }
+
+    /* Przyciski / utility */
+    .btn {
+      display: inline-block;
+      padding: .7rem 1rem;
+      border-radius: .6rem;
+      border: 1px solid var(--border);
+      background: var(--brand);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .btn.secondary {
+      background: transparent;
+      color: var(--fg);
+    }
+    .btn:focus-visible { outline-color: var(--focus); }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      padding-block: 2rem;
+    }
+    .hero-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    .hero img {
+      width: 100%;
+      height: auto;
+      border-radius: .75rem;
+      border: 1px solid var(--border);
+    }
+
+    /* Sekcje */
+    section {
+      padding-block: 2rem;
+    }
+    .section-title {
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      margin: 0 0 1rem 0;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    /* Tabela dostępna */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: .6rem .5rem; border-bottom: 1px solid var(--border); text-align: left; }
+    th { position: sticky; top: 64px; background: var(--panel); z-index: 1; }
+    caption { text-align: left; color: var(--muted); margin-bottom: .4rem; }
+
+    /* Formularz dostępny */
+    form { display: grid; gap: 1rem; }
+    label { font-weight: 600; }
+    input, textarea {
+      width: 100%;
+      padding: .75rem .8rem;
+      border: 1px solid var(--border);
+      border-radius: .6rem;
+      background: var(--panel);
+      color: var(--fg);
+    }
+    input:focus, textarea:focus { border-color: var(--brand); outline: 3px solid color-mix(in oklab, var(--brand) 35%, transparent); }
+    .hint { color: var(--muted); font-size: .95rem; }
+    .errors { color: var(--danger); }
+    .success { color: var(--success); }
+
+    /* Stopka */
+    footer {
+      padding-block: 2rem;
+      color: var(--muted);
+    }
+
+    /* Media queries */
+    @media (min-width: 720px) {
+      .hero-grid { grid-template-columns: 1.2fr .8fr; align-items: center; }
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Ograniczenie animacji */
+    @media (prefers-reduced-motion: reduce) {
+      html:focus-within { scroll-behavior: auto; }
+    }
+
+    /* Prosty hamburger dla małych ekranów */
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .menu-toggle {
+      background: transparent; border: 1px solid var(--border); border-radius: .5rem; padding: .4rem .6rem;
+    }
+    .menu {
+      display: none;
+    }
+    .menu.open {
+      display: block;
+    }
+    @media (min-width: 860px) {
+      .menu { display: block !important; }
+      .menu-toggle { display: none; }
+    }
+  </style>
+
+  <!-- Dane strukturalne: Person -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Twoje Imię i Nazwisko",
+    "jobTitle": "Specjalista ds. dostępności cyfrowej",
+    "description": "Krótki biogram — pasjonat dostępnych technologii, sportu Showdown oraz projektowania inkluzywnego.",
+    "url": "https://twojadomena.example",
+    "sameAs": ["https://github.com/twojprofil", "https://www.linkedin.com/in/twojprofil"]
+  }
+  </script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Pomiń do treści</a>
+
+  <header role="banner">
+    <div class="wrap nav-row">
+      <div class="brand" aria-label="Identyfikacja strony">
+        <span class="brand-logo" aria-hidden="true"></span>
+        <span>Twoje Imię i Nazwisko</span>
+      </div>
+
+      <button class="menu-toggle" aria-expanded="false" aria-controls="site-menu" aria-label="Pokaż/ukryj menu">
+        ☰ Menu
+      </button>
+
+      <nav id="site-menu" class="menu" aria-label="Główne" role="navigation">
+        <ul>
+          <li><a href="#o-mnie">O mnie</a></li>
+          <li><a href="#doswiadczenie">Doświadczenie</a></li>
+          <li><a href="#projekty">Projekty</a></li>
+          <li><a href="#kontakt">Kontakt</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div class="wrap hero">
+      <section class="hero-grid" aria-labelledby="t-hero">
+        <div class="hero-card">
+          <h1 id="t-hero">Cześć! Nazywam się <span style="white-space:nowrap;">Twoje Imię</span>.</h1>
+          <p>Tworzę produkty cyfrowe zgodne z <abbr title="Web Content Accessibility Guidelines">WCAG</abbr>, projektuję dostępne interfejsy i wspieram zespoły w budowaniu inkluzywnych usług. Po godzinach angażuję się w sport <strong>Showdown</strong> oraz edukację na temat dostępności.</p>
+          <p class="hint">Ta strona jest responsywna, przyjazna dla klawiatury i czytników ekranu. Używa semantycznych znaczników, widocznych stanów focus i preferencji systemu (dark mode, reduced motion).</p>
+          <div style="display:flex; gap:.75rem; flex-wrap: wrap; margin-top:.75rem;">
+            <a class="btn" href="#kontakt">Napisz do mnie</a>
+            <a class="btn secondary" href="#projekty">Zobacz projekty</a>
+          </div>
+        </div>
+
+        <figure class="hero-card" role="group" aria-labelledby="portret-caption">
+          <img src="https://via.placeholder.com/800x600.png?text=Twoje+zdjecie+%28alt+tekst%29" alt="Portret — opisz zdjęcie tak, by miało sens bez obrazu." />
+          <figcaption id="portret-caption" class="hint">To miejsce na Twój portret z opisowym alt-tekstem.</figcaption>
+        </figure>
+      </section>
+    </div>
+
+    <section id="o-mnie" class="wrap">
+      <h2 class="section-title">O mnie</h2>
+      <div class="grid-2">
+        <article class="card" aria-label="Biografia">
+          <p><strong>Krótki biogram:</strong> kilka zdań o doświadczeniu, wartościach i motywacjach. Skup się na tym, jak pomagasz ludziom dzięki dostępności i projektowaniu inkluzywnemu.</p>
+          <p><strong>Specjalizacje:</strong> audyty WCAG 2.2, szkolenia dla zespołów, projektowanie treści, testy z użytkownikami, doradztwo dla NGO i administracji publicznej.</p>
+          <ul>
+            <li>Projektowanie dostępnych komponentów UI</li>
+            <li>Badania z osobami z niepełnosprawnościami</li>
+            <li>Współpraca z deweloperami (ARIA, semantyka, kontrasty)</li>
+          </ul>
+        </article>
+        <aside class="card" aria-label="Szybkie fakty">
+          <h3 style="margin-top:0;">Szybkie fakty</h3>
+          <table aria-describedby="facts-note">
+            <caption id="facts-note">Informacje skrócone — ułatwiają szybki przegląd.</caption>
+            <thead>
+              <tr><th>Obszar</th><th>Wartość</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Lokalizacja</td><td>Poznań, Polska</td></tr>
+              <tr><td>Języki</td><td>Polski, Angielski</td></tr>
+              <tr><td>Zainteresowania</td><td>Dostępność, Showdown, edukacja</td></tr>
+            </tbody>
+          </table>
+        </aside>
+      </div>
+    </section>
+
+    <section id="doswiadczenie" class="wrap" aria-labelledby="t-dosw">
+      <h2 id="t-dosw" class="section-title">Doświadczenie</h2>
+      <div class="grid-2">
+        <article class="card">
+          <h3 style="margin-top:0;">Specjalista ds. dostępności — Firma/Instytucja</h3>
+          <p class="hint">2023–obecnie</p>
+          <p>Wdrożenia WCAG 2.2, szkolenia zespołów, przeglądy komponentów, procesy dostępności w cyklu wytwórczym.</p>
+        </article>
+        <article class="card">
+          <h3 style="margin-top:0;">UX Writer / Product Designer — Firma</h3>
+          <p class="hint">2020–2023</p>
+          <p>Projektowanie treści zrozumiałych dla szerokiej publiczności, testy, dostępne makiety i prototypy.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="projekty" class="wrap" aria-labelledby="t-proj">
+      <h2 id="t-proj" class="section-title">Wybrane projekty</h2>
+      <div class="grid-2">
+        <article class="card" aria-labelledby="p1-title">
+          <h3 id="p1-title" style="margin-top:0;">Audyt WCAG dla NGO</h3>
+          <p>Kompletny audyt z rekomendacjami, planem naprawczym i warsztatami dla zespołu.</p>
+          <a class="btn secondary" href="#" aria-label="Szczegóły projektu Audyt WCAG dla NGO">Szczegóły</a>
+        </article>
+        <article class="card" aria-labelledby="p2-title">
+          <h3 id="p2-title" style="margin-top:0;">Biblioteka komponentów A11y</h3>
+          <p>Zestaw zgodnych komponentów UI z dokumentacją i przykładami użycia (ARIA, role, keyboard).</p>
+          <a class="btn secondary" href="#" aria-label="Szczegóły projektu Biblioteka komponentów A11y">Szczegóły</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="kontakt" class="wrap" aria-labelledby="t-kontakt">
+      <h2 id="t-kontakt" class="section-title">Kontakt</h2>
+      <div class="grid-2">
+        <form class="card" aria-describedby="form-desc" novalidate>
+          <p id="form-desc" class="hint">Formularz jest prosty i dostępny. Wszystkie pola są opisane etykietami.</p>
+
+          <div>
+            <label for="name">Imię i nazwisko</label>
+            <input id="name" name="name" type="text" autocomplete="name" required aria-required="true" />
+          </div>
+
+          <div>
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required aria-required="true" />
+          </div>
+
+          <div>
+            <label for="msg">Wiadomość</label>
+            <textarea id="msg" name="message" rows="5" required aria-required="true"></textarea>
+            <p class="hint" id="msg-hint">Opisz krótko sprawę (min. 10 znaków).</p>
+          </div>
+
+          <div aria-live="polite" class="hint" id="form-status"></div>
+          <div role="alert" aria-live="assertive" class="errors" id="form-errors"></div>
+
+          <button class="btn" type="submit">Wyślij</button>
+        </form>
+
+        <aside class="card" aria-label="Inne metody kontaktu">
+          <h3 style="margin-top:0;">Inne metody kontaktu</h3>
+          <ul>
+            <li><a href="mailto:twoj.mail@example.com" aria-label="Wyślij e-mail">twoj.mail@example.com</a></li>
+            <li><a href="tel:+48123123123" aria-label="Zadzwoń">+48 123 123 123</a></li>
+            <li><a href="https://linkedin.com/in/twojprofil" aria-label="Profil na LinkedIn">LinkedIn</a></li>
+            <li><a href="https://github.com/twojprofil" aria-label="Profil na GitHub">GitHub</a></li>
+          </ul>
+          <p><a class="btn secondary" href="#" aria-label="Pobierz CV w formacie PDF">Pobierz CV (PDF)</a></p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap" role="contentinfo">
+    <p>&copy; <span id="year"></span> Twoje Imię i Nazwisko. Zbudowano z dbałością o <abbr title="Accessibility">A11y</abbr> i wydajność. <span class="hint">Licencja: MIT (możesz swobodnie modyfikować).</span></p>
+  </footer>
+
+  <script>
+    // Rok w stopce
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Prosty hamburger
+    const btn = document.querySelector('.menu-toggle');
+    const menu = document.getElementById('site-menu');
+    btn?.addEventListener('click', () => {
+      const isOpen = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    // Nawigacja: aria-current
+    const links = document.querySelectorAll('nav a[href^="#"]');
+    const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+    const setCurrent = () => {
+      let current = sections[0];
+      let fromTop = window.scrollY + 120;
+      for (const sec of sections) {
+        if (sec.offsetTop <= fromTop) current = sec;
+      }
+      links.forEach(a => a.removeAttribute('aria-current'));
+      const active = document.querySelector('nav a[href="#' + current.id + '"]');
+      active?.setAttribute('aria-current', 'page');
+    };
+    setCurrent();
+    document.addEventListener('scroll', setCurrent, { passive: true });
+
+    // Prosta walidacja formularza po stronie klienta
+    const form = document.querySelector('form');
+    const errors = document.getElementById('form-errors');
+    const status = document.getElementById('form-status');
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      errors.textContent = '';
+      status.textContent = '';
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const msg = form.message.value.trim();
+      const list = [];
+
+      if (!name) list.push('Podaj imię i nazwisko.');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) list.push('Podaj poprawny adres e-mail.');
+      if (!msg || msg.length < 10) list.push('Wiadomość powinna mieć co najmniej 10 znaków.');
+
+      if (list.length) {
+        errors.innerHTML = '<ul><li>' + list.join('</li><li>') + '</li></ul>';
+        errors.focus?.();
+        return;
+      }
+
+      status.textContent = 'Dziękuję! Formularz został zweryfikowany po stronie klienta.';
+      form.reset();
+    });
+  </script>
+</body>
+</html>
